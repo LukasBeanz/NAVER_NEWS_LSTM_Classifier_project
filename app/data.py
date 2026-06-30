@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import List, Tuple
 
 
-# BBC 기사 분류를 목표로 하며 sport, business, politics, tech, entertainment 계열의 라벨을 다룬다.
-# 실제 BBC 원본 데이터 파일이 없는 환경에서도 실행되도록 각 분야별 영문 샘플 기사를 내장했다.
+# 네이버 기사 분류를 목표로 하며 sport, business, politics, tech, entertainment 계열의 라벨을 다룬다.
+# 실제 네이버 원문 데이터 파일이 없는 환경에서도 실행되도록 각 분야별 한글 샘플 기사를 내장했다.
 SAMPLE_DATA: List[Tuple[str, str]] = [
     ("The football team won the final after scoring two late goals in the stadium", "sport"),
     ("The tennis champion reached the semi final with a powerful serve and fast return", "sport"),
