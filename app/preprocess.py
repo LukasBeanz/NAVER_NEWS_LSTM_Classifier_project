@@ -13,6 +13,17 @@ STOP_WORDS = {
     "the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "with", "after", "as", "by", "at", "during",
 }
 
+# ▼▼▼ [추가] 한국어 불용어 목록 ▼▼▼
+# 기존: 영어 불용어(STOP_WORDS)만 존재
+# 변경: 한국어 뉴스 제목에서 자주 등장하지만 분류에 도움이 안 되는 조사·어미·접속사를 추가
+KOREAN_STOP_WORDS = {
+    "이", "가", "을", "를", "은", "는", "에", "에서", "의", "와", "과", "도",
+    "로", "으로", "이다", "하다", "있다", "되다", "것", "수", "및", "등",
+    "대해", "통해", "위해", "관련", "대한", "라고", "이라고", "했다", "밝혔다",
+    "전했다", "나타났다", "알려졌다", "예정이다", "확인됐다",
+}
+# ▲▲▲ [추가] 한국어 불용어 목록 ▲▲▲
+
 
 def clean_text(text: str, remove_stopwords: bool = True) -> str:
     """영문 기사 문장에서 특수문자와 불필요한 단어를 제거한다."""
@@ -23,6 +34,27 @@ def clean_text(text: str, remove_stopwords: bool = True) -> str:
     if remove_stopwords:                                     # 제외어 제거 옵션이 켜져 있는지 확인한다.
         tokens = [w for w in tokens if w not in STOP_WORDS]  # 의미가 약한 불용어를 제거한다.
     return " ".join(tokens)                                  # 정제된 토큰들을 다시 하나의 문자열로 합친다.
+
+
+# ▼▼▼ [추가] 한국어 전처리 함수 ▼▼▼
+# 기존: 영어 전용 clean_text()만 존재 (한글 문자를 모두 제거해 버려 한국어에 사용 불가)
+# 변경: 한국어 기사 제목 전처리 전용 함수 추가
+#        - 한글(가-힣)과 공백만 남기고 나머지(영문/숫자/특수문자) 제거
+#        - 한국어 불용어(KOREAN_STOP_WORDS) 제거
+#        - konlpy 없이 공백 기반 토큰화 → 추가 패키지 없이 실행 가능
+def clean_korean_text(text: str, remove_stopwords: bool = True) -> str:
+    """한국어 기사 제목에서 특수문자와 불필요한 단어를 제거한다.
+
+    영문·숫자·특수문자를 모두 제거하고 한글과 공백만 남긴다.
+    이후 공백 기준으로 토큰화하고 한국어 불용어를 제거한다.
+    """
+    text = re.sub(r"[^가-힣\s]", " ", text)                      # 한글과 공백 외의 문자를 공백으로 대체한다.
+    text = re.sub(r"\s+", " ", text).strip()                      # 연속 공백을 하나로 줄인다.
+    tokens = text.split()                                          # 공백 기준으로 어절을 분리한다.
+    if remove_stopwords:
+        tokens = [w for w in tokens if w not in KOREAN_STOP_WORDS]  # 한국어 불용어를 제거한다.
+    return " ".join(tokens)
+# ▲▲▲ [추가] 한국어 전처리 함수 ▲▲▲
 
 
 def build_vocab(texts: Sequence[str], max_vocab: int) -> Dict[str, int]:
